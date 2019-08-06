@@ -4,7 +4,7 @@
 SSD1306_Mini oled; // Declare the OLED object
 
 #define CYCLE 20
-#define TYRE_DIAMETER 0.6604 //(in meters)
+#define TYRE_DIAMETER 0.6604 //(in meters) 26inch standart tyre
 volatile bool pinChanged = false;
 byte revolutions;
 unsigned int rpm;
@@ -41,7 +41,7 @@ void updateTotalKM() {
 
 void setup() {
   oled.init(0x3C); // Initializes the display to the specified address
-  //oled.clear(); // Clears the display
+  oled.clear(); // Clears the display
   GIMSK = 0b00100000;    // turns on pin change interrupts
   PCMSK = 0b00010000;    // turn on interrupts on pins PB0, PB1, PB4
   sei();                 // enables interrupts
@@ -72,9 +72,11 @@ int reading = LOW;
 
 void loop() {
   if (pinChanged) {
-    reading = digitalRead(4);
-    if (reading == HIGH) {
+    if ((PINB & 0b00010000) != 0b00000000) {
+      reading = HIGH;
       revolutions++;
+    } else {
+      reading = LOW;
     }
     pinChanged = false;
   }
@@ -100,8 +102,7 @@ void loop() {
         cli();
         rpm = 60000 / (millis() - passedtime) * CYCLE;
         passedtime = millis();
-        float speed = TYRE_DIAMETER * rpm * 0.10472;
-        updateSpeed(speed);
+        updateSpeed(TYRE_DIAMETER * rpm * 0.10472);
         revolutions = 0;
         sei();
       }
