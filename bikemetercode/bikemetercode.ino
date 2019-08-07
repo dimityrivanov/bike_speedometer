@@ -20,6 +20,7 @@ int buttonState;             // the current reading from the input pin
 int lastButtonState = LOW;   // the previous reading from the input pin
 int reading = LOW;
 bool updateCycleTime = false;
+unsigned long totalMilageUpdate = 0;
 
 // the following variables are unsigned longs because the time, measured in
 // milliseconds, will quickly become a bigger number than can be stored in an int.
@@ -101,7 +102,6 @@ void handlePinChange() {
 }
 
 unsigned long test = 0;
-unsigned long totalMilageUpdate = 0;
 
 void loop() {
   //handlePinChange();
@@ -122,6 +122,7 @@ void loop() {
     lastDebounceTime = millis();
   }
 
+  //if there is no cycling activity for more than 1.5S, assume that the bike is stopped
   if ((millis() - lastDebounceTime) > 1500) {
     rpm = 0;
     passedtime = 0;
@@ -159,7 +160,6 @@ void loop() {
   }
 }
 
-ISR(PCINT0_vect)
-{
+ISR(PCINT0_vect) {
   pinChanged = true;
 }
